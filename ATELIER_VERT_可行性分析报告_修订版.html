@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ATELIER VERT — 可行性分析报告（修订版）</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{
+  --cream:#F5F0E8;--beige:#EDE8DF;--oak:#C8B89A;--oak-dk:#B0A08A;
+  --green:#7A9E7E;--green-dk:#4A7055;--moss:#3B5E42;
+  --pink:#D4537E;--pink-dk:#993556;--pink-lt:#FBEAF0;--pink-mid:#F4C0D1;
+  --teal:#1D9E75;--teal-dk:#0F6E56;--teal-lt:#E1F5EE;
+  --amber:#EF9F27;--amber-dk:#BA7517;--amber-lt:#FAEEDA;
+  --tea:#9B59B6;--tea-dk:#6C3483;--tea-lt:#F5EEF8;
+  --charcoal:#2C2C2A;--gray:#5F5E5A;--gray-lt:#D3D1C7;
+  --micro:#F0EBE3;--white:#fff;
+  --r:12px;--r-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--cream);color:var(--charcoal);font-size:14px;line-height:1.7}
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:var(--charcoal);display:flex;gap:2px;padding:0 16px;overflow-x:auto}
+.nav-btn{padding:14px 14px;border:none;background:none;color:#aaa;font-size:12px;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:.15s}
+.nav-btn.active,.nav-btn:hover{color:#fff;border-bottom-color:var(--pink)}
+.nav-btn.drinks-tab{color:#C39BD3}
+.nav-btn.drinks-tab.active,.nav-btn.drinks-tab:hover{border-bottom-color:var(--tea)}
+/* HERO */
+.hero{background:var(--charcoal);color:#fff;padding:56px 24px 48px;text-align:center}
+.hero h1{font-size:clamp(28px,5vw,52px);font-weight:700;color:var(--pink-mid);letter-spacing:0.04em}
+.hero .subtitle{font-size:16px;color:#aaa;margin-top:6px}
+.hero .badge-new{display:inline-block;background:var(--tea);color:#fff;font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;margin-left:10px;vertical-align:middle}
+.hero-cards{display:flex;gap:10px;justify-content:center;margin-top:32px;flex-wrap:wrap}
+.hero-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:var(--r);padding:18px 22px;min-width:150px}
+.hero-card .num{font-size:26px;font-weight:700;margin-bottom:4px}
+.hero-card .lbl{font-size:11px;color:#888}
+/* SECTIONS */
+.section{display:none;padding:24px 16px 40px;max-width:1060px;margin:0 auto}
+.section.active{display:block}
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--gray-lt);border-radius:var(--r);padding:20px 24px;margin-bottom:16px}
+/* SECTION HEADINGS */
+.sh1{font-size:22px;font-weight:700;color:var(--pink-dk);margin:28px 0 16px;padding-bottom:8px;border-bottom:2px solid var(--pink-mid)}
+.sh1.drinks{color:var(--tea-dk);border-bottom-color:#C39BD3}
+.sh2{font-size:17px;font-weight:600;color:var(--charcoal);margin:20px 0 10px}
+/* METRICS ROW */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.metric{background:var(--beige);border-radius:var(--r-sm);padding:14px 16px}
+.metric.tea{background:var(--tea-lt)}
+.metric .lbl{font-size:11px;color:var(--gray);margin-bottom:4px}
+.metric .val{font-size:20px;font-weight:700}
+.metric .sub{font-size:11px;color:var(--gray);margin-top:2px}
+/* TABLES */
+.tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:4px}
+.tbl th{background:var(--pink-dk);color:#fff;padding:8px 10px;text-align:left;font-weight:600}
+.tbl td{padding:7px 10px;border-bottom:1px solid var(--gray-lt)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:nth-child(even) td{background:#fafafa}
+.tbl-teal th{background:var(--teal-dk)}
+.tbl-amber th{background:var(--amber-dk)}
+.tbl-charcoal th{background:var(--charcoal)}
+.tbl-tea th{background:var(--tea-dk)}
+/* BADGES */
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600}
+.bp{background:var(--pink-lt);color:var(--pink-dk)}
+.bt{background:var(--teal-lt);color:var(--teal-dk)}
+.ba{background:var(--amber-lt);color:var(--amber-dk)}
+.bq{background:var(--tea-lt);color:var(--tea-dk)}
+.bg-{background:var(--beige);color:var(--gray)}
+/* INFO BOXES */
+.info-box{border-radius:var(--r-sm);padding:14px 16px;font-size:13px;margin-bottom:12px;border-left:4px solid}
+.ib-teal{background:var(--teal-lt);border-color:var(--teal);color:#085041}
+.ib-pink{background:var(--pink-lt);border-color:var(--pink);color:#4B1528}
+.ib-amber{background:var(--amber-lt);border-color:var(--amber);color:#412402}
+.ib-tea{background:var(--tea-lt);border-color:var(--tea);color:#4A235A}
+/* PALETTE */
+.palette{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.swatch{height:56px;flex:1;min-width:80px;border-radius:var(--r-sm);display:flex;flex-direction:column;justify-content:flex-end;padding:6px 8px}
+/* ZONE GRID */
+.zone-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.zone{border-radius:var(--r-sm);padding:12px 14px}
+/* SCENARIO special */
+.profit-pos{color:var(--teal-dk)}
+.profit-neg{color:#A32D2D}
+/* CHART CONTAINER */
+.chart-wrap{position:relative;height:280px;margin:12px 0}
+/* INS GRID */
+.ins-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-bottom:12px}
+.ins-card{border-radius:var(--r-sm);padding:12px;border:1px solid var(--gray-lt);background:var(--white)}
+.ins-num{font-size:20px;font-weight:700;margin-bottom:4px}
+.ins-title{font-size:13px;font-weight:600;color:var(--charcoal);margin-bottom:4px}
+.ins-desc{font-size:12px;color:var(--gray)}
+/* LOCATION CARDS */
+.loc-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:16px}
+.loc-card{background:var(--white);border:1px solid var(--gray-lt);border-radius:var(--r);padding:14px 16px}
+.loc-card.best{border:2px solid var(--teal)}
+.loc-name{font-size:15px;font-weight:700;margin-bottom:4px}
+.loc-sub{font-size:12px;color:var(--gray);margin-bottom:10px}
+.loc-score{font-size:28px;font-weight:700;float:right;line-height:1}
+.loc-stat{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--gray-lt)}
+.loc-stat:last-child{border:none}
+/* INTERACTIVE BE */
+.slider-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.slider-row label{font-size:13px;color:var(--gray);width:110px;flex-shrink:0}
+.slider-row input[type=range]{flex:1}
+.slider-row .val{font-size:13px;font-weight:600;min-width:90px;text-align:right}
+.be-boxes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0}
+.be-box{border-radius:var(--r-sm);padding:14px;text-align:center}
+.be-box .bnum{font-size:22px;font-weight:700;margin-bottom:4px}
+.be-box .blbl{font-size:12px}
+/* TIMELINE */
+.timeline{position:relative;padding-left:32px}
+.timeline::before{content:'';position:absolute;left:12px;top:0;bottom:0;width:2px;background:var(--gray-lt)}
+.tl-item{position:relative;margin-bottom:20px}
+.tl-dot{position:absolute;left:-24px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--pink-dk);border:2px solid var(--cream)}
+.tl-phase{font-size:12px;font-weight:600;color:var(--pink-dk);margin-bottom:4px}
+.tl-content{font-size:13px;color:var(--gray)}
+/* RISK */
+.risk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-bottom:12px}
+.risk-card{border-radius:var(--r-sm);padding:14px;border-left:4px solid var(--amber)}
+.risk-high{border-color:#E24B4A;background:#FFF5F5}
+.risk-med{border-color:var(--amber);background:var(--amber-lt)}
+.risk-low{border-color:var(--teal);background:var(--teal-lt)}
+.risk-title{font-size:13px;font-weight:600;margin-bottom:6px}
+.risk-body{font-size:12px;color:var(--gray)}
+/* FLOOR PLAN */
+.fp-container{background:var(--beige);border-radius:var(--r);padding:8px;margin-bottom:8px;overflow:auto}
+canvas{display:block;max-width:100%}
+/* PROGRESS BAR */
+.progress-wrap{margin-bottom:6px}
+.progress-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+.progress-track{height:8px;background:var(--beige);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;transition:width .4s}
+/* DRINKS PRODUCT CARDS */
+.drink-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px}
+.drink-card{background:var(--white);border-radius:var(--r);padding:18px;border-top:4px solid var(--tea);border:1px solid var(--gray-lt);border-top:4px solid var(--tea)}
+.drink-card h4{font-size:14px;font-weight:700;color:var(--tea-dk);margin-bottom:8px}
+.drink-card .price{font-size:22px;font-weight:700;color:var(--charcoal);margin-bottom:4px}
+.drink-card .sub{font-size:12px;color:var(--gray)}
+/* TREND STAGE */
+.trend-stages{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:16px}
+.trend-stage{background:var(--white);border-radius:var(--r);padding:16px;border-left:4px solid var(--teal)}
+.ts-period{font-size:11px;font-weight:600;color:var(--teal-dk);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em}
+.ts-rev{font-size:22px;font-weight:700;color:var(--charcoal);margin-bottom:6px}
+.ts-label{font-size:12px;color:var(--gray)}
+/* COMPETITION */
+.comp-vs{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;margin-bottom:16px}
+.comp-side{background:var(--white);border-radius:var(--r);padding:16px;font-size:13px}
+.comp-vs-badge{background:var(--pink-dk);color:#fff;font-weight:700;font-size:13px;padding:8px 12px;border-radius:50%;text-align:center}
+/* RESPONSIVE */
+@media(max-width:600px){
+  .zone-grid,.be-boxes,.comp-vs{grid-template-columns:1fr}
+  .hero-cards{gap:8px}
+  .hero-card{min-width:130px;padding:14px 16px}
+  .trend-stages{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>ATELIER VERT<span class="badge-new">修订版</span></h1>
+  <p class="subtitle">美甲 × 中式饮品 复合店 · 卡萨布兰卡，摩洛哥 · 可行性分析报告 · 2026</p>
+  <div style="font-size:13px;color:#666;margin-top:6px">Nail · Milk Tea · Fruit Coffee · Casablanca</div>
+  <div class="hero-cards">
+    <div class="hero-card"><div class="num" style="color:var(--pink-mid)">MAD 35万</div><div class="lbl">总投资预算</div></div>
+    <div class="hero-card"><div class="num" style="color:#9FE1CB">约 65㎡</div><div class="lbl">推荐店铺面积</div></div>
+    <div class="hero-card"><div class="num" style="color:var(--amber)">4 工位</div><div class="lbl">美甲主营工位</div></div>
+    <div class="hero-card"><div class="num" style="color:#9FE1CB">12–18月</div><div class="lbl">良好场景回本</div></div>
+    <div class="hero-card"><div class="num" style="color:#C39BD3">MAD 5k+</div><div class="lbl">团购月固定收入</div></div>
+  </div>
+</div>
+
+<nav class="nav" id="nav">
+  <button class="nav-btn active" onclick="showTab('overview')">项目概述</button>
+  <button class="nav-btn" onclick="showTab('location')">选址分析</button>
+  <button class="nav-btn drinks-tab" onclick="showTab('drinks')">🧋 饮品板块</button>
+  <button class="nav-btn" onclick="showTab('layout')">空间布局</button>
+  <button class="nav-btn" onclick="showTab('renovation')">装修预算</button>
+  <button class="nav-btn" onclick="showTab('pricing')">定价策略</button>
+  <button class="nav-btn" onclick="showTab('profit')">盈利趋势</button>
+  <button class="nav-btn" onclick="showTab('competition')">竞争分析</button>
+  <button class="nav-btn" onclick="showTab('breakeven')">盈亏测算</button>
+  <button class="nav-btn" onclick="showTab('risk')">风险与时间线</button>
+</nav>
+
+<!-- ══════════════════ TAB 1: OVERVIEW ══════════════════ -->
+<div class="section active" id="tab-overview">
+  <div class="sh1">一、项目概述（升级版）</div>
+
+  <div class="info-box ib-tea">🧋 <strong>业务结构升级：</strong>本报告修订版将店铺定位从「美甲+精品咖啡」升级为「美甲+中式饮品（奶茶+果咖）」复合业态，新增企业团购通道，打通在摩中国居民消费需求，形成双客群、双收入、抗波动的商业结构。</div>
+
+  <div class="metrics">
+    <div class="metric"><div class="lbl">项目类型</div><div class="val" style="font-size:15px">美甲+中式饮品</div><div class="sub">复合型生活方式店</div></div>
+    <div class="metric"><div class="lbl">目标城市</div><div class="val" style="font-size:15px">卡萨布兰卡</div><div class="sub">摩洛哥最大城市</div></div>
+    <div class="metric"><div class="lbl">品牌占位名</div><div class="val" style="font-size:15px">ATELIER VERT</div><div class="sub">法语"绿色工作室"</div></div>
+    <div class="metric tea"><div class="lbl">新增：团购通道</div><div class="val" style="font-size:15px">中资企业</div><div class="sub">稳定固定月收入</div></div>
+  </div>
+
+  <div class="sh2">核心定位（修订版）</div>
+  <table class="tbl" style="margin-bottom:16px">
+    <tr><th>维度</th><th>定位内容</th><th>营收占比</th></tr>
+    <tr><td><strong>主营业务</strong></td><td>美甲（日系延长甲、彩绘、甲油胶），中国技术壁垒</td><td><strong>约 70%</strong></td></tr>
+    <tr><td><strong>中式饮品零售</strong></td><td>奶茶（珍珠/芋泥/黑糖）+ 果咖（气泡/冷萃），面向在摩中国人及本地年轻客</td><td><strong>约 15%</strong></td></tr>
+    <tr><td><strong>企业团购</strong></td><td>中资企业茶歇定期采购，固定收入，抗淡季</td><td><strong>约 10%</strong></td></tr>
+    <tr><td><strong>精品咖啡</strong></td><td>意式/手冲，面向本地等候女性，引流为主</td><td><strong>约 5%</strong></td></tr>
+    <tr><td>技术壁垒</td><td>中国师傅驻店教学，本地学徒培训，中国技术+本地化运营</td><td>—</td></tr>
+    <tr><td>设计风格</td><td>Crème Forest：奶油白 × 原木 × 森林绿，强ins传播属性</td><td>—</td></tr>
+  </table>
+
+  <div class="sh2">双客群结构（核心差异化）</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+    <div style="background:var(--pink-lt);border-radius:var(--r);padding:16px;border-left:4px solid var(--pink)">
+      <div style="font-size:13px;font-weight:700;color:var(--pink-dk);margin-bottom:8px">💅 本地摩洛哥中产女性</div>
+      <div style="font-size:12px;color:#4B1528">25–45岁，有消费能力，重视美甲品质与私密体验。核心诉求：日系/中国专业技术 + 私密安心环境（穆斯林摘头巾需求）。</div>
+      <div style="margin-top:8px;font-size:12px;font-weight:600;color:var(--pink-dk)">主要贡献：美甲营收 70%</div>
+    </div>
+    <div style="background:var(--tea-lt);border-radius:var(--r);padding:16px;border-left:4px solid var(--tea)">
+      <div style="font-size:13px;font-weight:700;color:var(--tea-dk);margin-bottom:8px">🧋 在摩中国居民及企业</div>
+      <div style="font-size:12px;color:#4A235A">在摩常住中国人约1–2万，含商务/工程/外派人员。强烈的中式饮品需求长期未被满足。中资企业茶歇为稳定B端来源。</div>
+      <div style="margin-top:8px;font-size:12px;font-weight:600;color:var(--tea-dk)">主要贡献：饮品+团购 25%</div>
+    </div>
+  </div>
+
+  <div class="sh2">人员配置</div>
+  <table class="tbl tbl-teal" style="margin-bottom:16px">
+    <tr><th>角色</th><th>人数</th><th>驻店方式</th><th>职责</th></tr>
+    <tr><td>投资人本人</td><td>—</td><td>与师傅轮流驻卡萨</td><td>战略管理、财务监督、供应链对接；<strong>重点拓展企业团购客户</strong></td></tr>
+    <tr><td>中国师傅</td><td>1人</td><td>轮驻，每次≥2–4周，前6月高频</td><td>核心技术输出、培训本地工人</td></tr>
+    <tr><td>中国学徒</td><td>1人</td><td>长期驻店</td><td>日常运营管理、美甲技术教学、<strong>饮品出品质量把控</strong></td></tr>
+    <tr><td>本地工人</td><td>2人</td><td>全职驻店</td><td>执行美甲服务；可兼顾饮品区简单操作</td></tr>
+  </table>
+
+  <div class="info-box ib-amber">⚠️ 中国学徒须持摩洛哥合法工作许可证（Permis de Travail）。建议提前6个月委托当地律师办理，预留费用约 MAD 3,000–5,000。本地员工须签正式合同并缴纳CNSS社会保险。</div>
+
+  <div class="sh2">设计风格 — Crème Forest 色板</div>
+  <div class="palette">
+    <div class="swatch" style="background:#F5F0E8"><span style="font-size:11px;color:#5F5E5A;font-weight:600">奶油白</span><span style="font-size:10px;color:#888">#F5F0E8</span></div>
+    <div class="swatch" style="background:#E8DFD0"><span style="font-size:11px;color:#5F5E5A;font-weight:600">暖米色</span><span style="font-size:10px;color:#888">#E8DFD0</span></div>
+    <div class="swatch" style="background:#C8B89A"><span style="font-size:11px;color:#444;font-weight:600">原木棕</span><span style="font-size:10px;color:#666">#C8B89A</span></div>
+    <div class="swatch" style="background:#7A9E7E"><span style="font-size:11px;color:#F1EFE8;font-weight:600">森林绿</span><span style="font-size:10px;color:#E1F5EE">#7A9E7E</span></div>
+    <div class="swatch" style="background:#4A7055"><span style="font-size:11px;color:#E1F5EE;font-weight:600">深苔绿</span><span style="font-size:10px;color:#9FE1CB">#4A7055</span></div>
+    <div class="swatch" style="background:#9B59B6"><span style="font-size:11px;color:#F5EEF8;font-weight:600">茶香紫</span><span style="font-size:10px;color:#D7BDE2">#9B59B6</span></div>
+  </div>
+
+  <div class="sh2">Instagram 打卡点（传播核心）</div>
+  <div class="ins-grid">
+    <div class="ins-card"><div class="ins-num" style="color:var(--green-dk)">①</div><div class="ins-title">苔藓打卡背景墙</div><div class="ins-desc">保鲜苔藓+黄铜品牌字，美甲区入口，客人自然取景</div></div>
+    <div class="ins-card"><div class="ins-num" style="color:var(--amber-dk)">②</div><div class="ins-title">摩洛哥弧形门洞</div><div class="ins-desc">砖砌拱形，白墙+绿植框，高传播构图</div></div>
+    <div class="ins-card"><div class="ins-num" style="color:var(--pink-dk)">③</div><div class="ins-title">手部拍照台</div><div class="ins-desc">大理石纹托盘+干花+45°聚光灯，完工即拍</div></div>
+    <div class="ins-card"><div class="ins-num" style="color:var(--teal-dk)">④</div><div class="ins-title">月亮弧形镜×4</div><div class="ins-desc">每工位配黄铜框弧形镜，映绿植灯光</div></div>
+    <div class="ins-card"><div class="ins-num" style="color:var(--pink-dk)">⑤</div><div class="ins-title">彩虹甲油架</div><div class="ins-desc">木格架嵌彩色甲油瓶，渐变排列装置感</div></div>
+    <div class="ins-card"><div class="ins-num" style="color:var(--amber-dk)">⑥</div><div class="ins-title">奶茶出品台</div><div class="ins-desc">🧋 新增：原木吧台+气泡饮品，饮品颜值出片率高</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════ TAB 2: LOCATION ══════════════════ -->
+<div class="section" id="tab-location">
+  <div class="sh1">二、卡萨布兰卡选址分析</div>
+
+  <div class="info-box ib-teal">卡萨布兰卡人口约400万，是摩洛哥最大城市与经济中心。在摩常住中国人约1–2万（工程、商贸、外派），主要聚集于Ain Diab、Racine、Maarif一带，对中式饮品有真实且未被满足的消费需求。</div>
+
+  <div class="sh2">四大商圈综合评分（新增中国客群维度）</div>
+  <div class="loc-cards">
+    <div class="loc-card best">
+      <div class="loc-score" style="color:var(--teal-dk)">9.2</div>
+      <div class="loc-name">Ain Diab / Anfa</div>
+      <div class="loc-sub">滨海中高端住宅区</div>
+      <span class="badge bt">首选推荐</span>
+      <div style="margin-top:10px">
+        <div class="loc-stat"><span>月租金</span><span style="font-weight:600">MAD 6,000–9,000</span></div>
+        <div class="loc-stat"><span>美甲客群匹配</span><span>★★★★★ 极高</span></div>
+        <div class="loc-stat"><span>中国居民密度</span><span>★★★★ 高</span></div>
+        <div class="loc-stat"><span>团购拓展潜力</span><span>★★★★ 强</span></div>
+        <div class="loc-stat"><span>私密感营造</span><span>容易</span></div>
+      </div>
+    </div>
+    <div class="loc-card">
+      <div class="loc-score" style="color:var(--pink-dk)">8.8</div>
+      <div class="loc-name">Racine / Bourgogne</div>
+      <div class="loc-sub">成熟中产商业街区</div>
+      <span class="badge bp">推荐</span>
+      <div style="margin-top:10px">
+        <div class="loc-stat"><span>月租金</span><span style="font-weight:600">MAD 7,000–10,000</span></div>
+        <div class="loc-stat"><span>美甲客群匹配</span><span>★★★★★ 极高</span></div>
+        <div class="loc-stat"><span>中国居民密度</span><span>★★★★ 高</span></div>
+        <div class="loc-stat"><span>商务人士流量</span><span>稳定，适合团购</span></div>
+        <div class="loc-stat"><span>街道人气</span><span>日常流量稳定</span></div>
+      </div>
+    </div>
+    <div class="loc-card">
+      <div class="loc-score" style="color:var(--amber-dk)">7.5</div>
+      <div class="loc-name">Gauthier</div>
+      <div class="loc-sub">老牌高端区</div>
+      <span class="badge ba">备选</span>
+      <div style="margin-top:10px">
+        <div class="loc-stat"><span>月租金</span><span style="font-weight:600">MAD 8,000–12,000</span></div>
+        <div class="loc-stat"><span>美甲客群匹配</span><span>★★★★ 高</span></div>
+        <div class="loc-stat"><span>中国居民密度</span><span>★★ 低</span></div>
+        <div class="loc-stat"><span>团购潜力</span><span>中等</span></div>
+        <div class="loc-stat"><span>建议时机</span><span>品牌成熟后</span></div>
+      </div>
+    </div>
+    <div class="loc-card">
+      <div class="loc-score" style="color:var(--gray)">7.0</div>
+      <div class="loc-name">Maarif</div>
+      <div class="loc-sub">核心商圈</div>
+      <span class="badge bg-">谨慎</span>
+      <div style="margin-top:10px">
+        <div class="loc-stat"><span>月租金</span><span style="font-weight:600">MAD 10,000–15,000</span></div>
+        <div class="loc-stat"><span>人流量</span><span>★★★★★ 极高</span></div>
+        <div class="loc-stat"><span>竞争强度</span><span>高，已有中国美甲店</span></div>
+        <div class="loc-stat"><span>预算压力</span><span>超出舒适区</span></div>
+        <div class="loc-stat"><span>建议时机</span><span>第二店扩张时考虑</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sh2">租金区间可视化对比</div>
+  <div class="chart-wrap"><canvas id="rentChart"></canvas></div>
+
+  <div class="sh2">选址执行清单</div>
+  <table class="tbl tbl-teal">
+    <tr><th>要求项目</th><th>标准</th></tr>
+    <tr><td>铺面门牌</td><td>独立门牌，临街面不过宽（3–6m），门面要求<strong>能展示饮品吧台</strong>（增加路人自然引流）</td></tr>
+    <tr><td>室内条件</td><td>可做内部隔断，层高≥2.8m（通风除甲油味必要）</td></tr>
+    <tr><td>水电管道</td><td>优先选带独立卫生间管道的铺面；饮品区需额外水管接口</td></tr>
+    <tr><td>现场踩点</td><td>正式签约前工作日与周末各蹲守半天，<strong>同时观察中国居民/商务人士流量</strong></td></tr>
+    <tr><td>租约条款</td><td>建议签2年以上，前3个月租金作押金，谈妥免租装修期（≥30天）</td></tr>
+    <tr><td>月租金红线</td><td>控制在 MAD 6,000–8,000，不超过月预期营收的25%</td></tr>
+  </table>
+</div>
+
+<!-- ══════════════════ TAB 3: DRINKS (NEW) ══════════════════ -->
+<div class="section" id="tab-drinks">
+  <div class="sh1 drinks">三、饮品板块专项分析（新增）</div>
+
+  <div class="info-box ib-tea">🧋 本章为修订版新增章节。饮品板块定位为「中式特色饮品」，分为零售端（门店直销）和团购端（B端批量）两条通道，有效覆盖在摩中国居民社群，并为店铺带来稳定固定收入，显著降低依赖美甲单一收入的风险。</div>
+
+  <div class="sh2">产品线规划</div>
+  <div class="drink-cards">
+    <div class="drink-card">
+      <h4>🧋 中式奶茶</h4>
+      <div class="price">MAD 30–45</div>
+      <div class="sub">珍珠奶茶、芋泥奶茶、黑糖厚乳、抹茶拿铁</div>
+      <div style="margin-top:10px;font-size:12px;color:var(--tea-dk);font-weight:600">主力品类 · 高辨识度</div>
+    </div>
+    <div class="drink-card">
+      <h4>🍊 果咖系列</h4>
+      <div class="price">MAD 35–55</div>
+      <div class="sub">气泡美式+水果、冷萃果茶、生椰拿铁、橙C拿铁</div>
+      <div style="margin-top:10px;font-size:12px;color:var(--tea-dk);font-weight:600">差异化单品 · ins出片高</div>
+    </div>
+    <div class="drink-card">
+      <h4>☕ 精品咖啡</h4>
+      <div class="price">MAD 25–35</div>
+      <div class="sub">意式拿铁、手冲、卡布基诺、美式</div>
+      <div style="margin-top:10px;font-size:12px;color:var(--gray);font-weight:600">引流为主 · 本地女性</div>
+    </div>
+    <div class="drink-card" style="border-top-color:var(--teal)">
+      <h4>🏢 企业团购套餐</h4>
+      <div class="price" style="font-size:18px">MAD 22–35/杯</div>
+      <div class="sub">10杯起订，定制套餐，市区免费配送，可定期签约</div>
+      <div style="margin-top:10px;font-size:12px;color:var(--teal-dk);font-weight:600">固定收入 · 抗淡季</div>
+    </div>
+  </div>
+
+  <div class="sh2">团购业务拓展路径</div>
+  <div class="info-box ib-teal">卡萨布兰卡中资企业茶歇市场几乎空白，目前无任何店铺系统性提供中式饮品配送服务。先切入者可快速积累固定客户，形成壁垒。</div>
+  <table class="tbl tbl-tea">
+    <tr><th>拓展阶段</th><th>目标</th><th>执行方式</th><th>预期月收入</th></tr>
+    <tr><td><span class="badge bq">开业前1月</span></td><td>拜访5–10家中资企业</td><td>投资人亲自上门，华人微信群推广</td><td>试水期</td></tr>
+    <tr><td><span class="badge bq">开业1–3月</span></td><td>签约首批3家企业客户</td><td>10杯起订，首次免费试喝，签季度合同</td><td>MAD 2,000–4,000</td></tr>
+    <tr><td><span class="badge bt">第4–6月</span></td><td>签约客户扩展至5–8家</td><td>口碑转介绍+华人社群运营</td><td>MAD 4,000–8,000</td></tr>
+    <tr><td><span class="badge bt">稳定期</span></td><td>8家以上固定客户</td><td>定制杯套/企业logo定制，增加黏性</td><td>MAD 6,000–12,000</td></tr>
+  </table>
+
+  <div class="sh2" style="margin-top:20px">团购收入月度趋势预测</div>
+  <div class="chart-wrap" style="height:240px"><canvas id="groupbuyChart"></canvas></div>
+
+  <div class="sh2">饮品设备与改造成本（修订预算）</div>
+  <table class="tbl tbl-tea">
+    <tr><th>设备/项目</th><th>金额（MAD）</th><th>说明</th></tr>
+    <tr><td>奶茶设备（封口机/热水器/冰沙机/雪克杯套装）</td><td>8,000</td><td>国内采购运摩，性价比高</td></tr>
+    <tr><td>半自动咖啡机（意式，兼顾果咖+意式）</td><td>8,000</td><td>原预算保留</td></tr>
+    <tr><td>冷藏展示柜（双门，约100L）</td><td>4,800</td><td>展示饮品原料+成品</td></tr>
+    <tr><td>吧台台面（原木，含安装）</td><td>4,800</td><td>兼顾等候+饮品出品</td></tr>
+    <tr><td>杯具/吸管/包装袋/首批奶茶原料</td><td>5,000</td><td>核心原料首批从国内带入，成本低30%+</td></tr>
+    <tr style="background:var(--tea-lt)"><td><strong>合计</strong></td><td><strong>30,600</strong></td><td>取代原「咖啡设备MAD 20,000」，增量约MAD 10,600</td></tr>
+  </table>
+  <div class="info-box ib-amber" style="margin-top:8px">⚠️ 饮品设备增量约MAD 10,600，可从装修节省项（非核心施工项目约节省MAD 10,000–15,000）或流动备用金内部调剂，总预算MAD 35万维持不变。</div>
+
+  <div class="sh2" style="margin-top:20px">供应链优势</div>
+  <div class="risk-grid">
+    <div class="risk-card" style="border-color:var(--tea);background:var(--tea-lt)"><div class="risk-title" style="color:var(--tea-dk)">📦 原料成本优势</div><div class="risk-body">投资人中摩往返，可以低成本从国内带入奶茶核心原料（茶粉、珍珠、配料），成本低于摩洛哥本地采购约30%。</div></div>
+    <div class="risk-card" style="border-color:var(--teal);background:var(--teal-lt)"><div class="risk-title" style="color:var(--teal-dk)">🌟 先发市场空白</div><div class="risk-body">国际奶茶品牌（Gong Cha、HEYTEA等）尚未进入摩洛哥，本地竞争几乎为零，先发优势明显。</div></div>
+    <div class="risk-card" style="border-color:var(--amber);background:var(--amber-lt)"><div class="risk-title" style="color:var(--amber-dk)">⚠️ 原料进口注意事项</div><div class="risk-body">需提前了解摩洛哥食品进口海关规定，核心原料建立3个月以上库存，同时开发本地可采购替代原料作备用。</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════ TAB 4: LAYOUT ══════════════════ -->
+<div class="section" id="tab-layout">
+  <div class="sh1">四、空间布局规划</div>
+
+  <div class="sh2">区域面积分配（总计约 65㎡）</div>
+  <div class="zone-grid">
+    <div class="zone" style="background:var(--tea-lt);border:1px solid #C39BD3">
+      <div style="font-size:13px;font-weight:600;color:var(--tea-dk);margin-bottom:6px">🧋 饮品区（升级版）</div>
+      <div style="font-size:22px;font-weight:700;color:var(--charcoal)">约 13㎡</div>
+      <div style="font-size:12px;color:var(--gray);margin-top:4px">临街可见 · 原木吧台 · 饮品出品台 · 奶茶设备 · 藤编吊灯</div>
+    </div>
+    <div class="zone" style="background:var(--micro);border:1px solid var(--pink)">
+      <div style="font-size:13px;font-weight:600;color:var(--pink-dk);margin-bottom:6px">💅 美甲私密区</div>
+      <div style="font-size:22px;font-weight:700;color:var(--charcoal)">约 33㎡</div>
+      <div style="font-size:12px;color:var(--gray);margin-top:4px">4工位 · 完全隔断 · 苔藓墙 · 弧形镜 · 高显色灯</div>
+    </div>
+    <div class="zone" style="background:var(--teal-lt);border:1px solid var(--teal)">
+      <div style="font-size:13px;font-weight:600;color:var(--teal-dk);margin-bottom:6px">🚻 共用卫生间</div>
+      <div style="font-size:22px;font-weight:700;color:var(--charcoal)">约 5㎡</div>
+      <div style="font-size:12px;color:var(--gray);margin-top:4px">两扇门垂直布置 · 动线完全分离</div>
+    </div>
+    <div class="zone" style="background:var(--beige);border:1px dashed var(--pink)">
+      <div style="font-size:13px;font-weight:600;color:var(--pink-dk);margin-bottom:6px">🗄️ 储物+VIP预留</div>
+      <div style="font-size:22px;font-weight:700;color:var(--charcoal)">约 8㎡</div>
+      <div style="font-size:12px;color:var(--gray);margin-top:4px">耗材库 · 饮品原料存储 · 换衣间 · 后期扩VIP包间</div>
+    </div>
+  </div>
+
+  <div class="sh2">面积占比</div>
+  <div class="progress-wrap"><div class="progress-label"><span>饮品区（含等候）</span><span>13㎡ · 20%</span></div><div class="progress-track"><div class="progress-fill" style="width:20%;background:var(--tea)"></div></div></div>
+  <div class="progress-wrap"><div class="progress-label"><span>美甲私密区</span><span>33㎡ · 51%</span></div><div class="progress-track"><div class="progress-fill" style="width:51%;background:var(--pink-dk)"></div></div></div>
+  <div class="progress-wrap"><div class="progress-label"><span>卫生间</span><span>5㎡ · 8%</span></div><div class="progress-track"><div class="progress-fill" style="width:8%;background:var(--teal)"></div></div></div>
+  <div class="progress-wrap"><div class="progress-label"><span>储物+VIP预留</span><span>8㎡ · 12%</span></div><div class="progress-track"><div class="progress-fill" style="width:12%;background:var(--green)"></div></div></div>
+  <div class="progress-wrap"><div class="progress-label"><span>员工休息角</span><span>6㎡ · 9%</span></div><div class="progress-track"><div class="progress-fill" style="width:9%;background:var(--gray-lt)"></div></div></div>
+
+  <div class="sh2" style="margin-top:24px">平面布局示意图（俯视）</div>
+  <div class="fp-container"><canvas id="floorCanvas" width="740" height="680"></canvas></div>
+
+  <div class="info-box ib-teal" style="margin-top:8px">
+    <strong>卫生间双向动线说明：</strong>咖啡/饮品区客人从卫生间上方门（北侧）进入；美甲区客人从卫生间左侧门（西侧）进入。两扇门方向垂直，动线完全不交叉，是保障穆斯林女性私密需求的关键投资（额外造价约MAD 4,000–7,000）。
+  </div>
+</div>
+
+<!-- ══════════════════ TAB 5: RENOVATION ══════════════════ -->
+<div class="section" id="tab-renovation">
+  <div class="sh1">五、装修预算明细（修订版）</div>
+
+  <div class="metrics">
+    <div class="metric"><div class="lbl">装修施工</div><div class="val" style="color:var(--pink-dk)">MAD 12.5万</div><div class="sub">精装含ins打卡点</div></div>
+    <div class="metric"><div class="lbl">美甲设备</div><div class="val" style="color:var(--teal-dk)">MAD 6万</div><div class="sub">4工位全套</div></div>
+    <div class="metric tea"><div class="lbl">饮品设备（升级）</div><div class="val" style="color:var(--tea-dk)">MAD 3.06万</div><div class="sub">奶茶+果咖+咖啡</div></div>
+    <div class="metric"><div class="lbl">一次性总投入</div><div class="val" style="color:var(--pink-dk)">MAD 29.56万</div><div class="sub">含押金证照</div></div>
+  </div>
+
+  <div class="sh2">预算构成可视化（修订版）</div>
+  <div class="chart-wrap"><canvas id="budgetChart"></canvas></div>
+
+  <div class="sh2">装修施工细项（MAD 125,000）</div>
+  <table class="tbl">
+    <tr><th>施工项目</th><th>金额（MAD）</th><th>优先级</th><th>说明</th></tr>
+    <tr><td>美甲区隔断墙/磨砂玻璃</td><td>30,000</td><td><span class="badge bp">必须</span></td><td>私密感核心，上半磨砂+下半实墙</td></tr>
+    <tr><td>弧形摩洛哥门洞</td><td>20,000</td><td><span class="badge bp">必须</span></td><td>砌砖、抹灰、黄铜线脚收边</td></tr>
+    <tr><td>卫生间双向门改造</td><td>12,000</td><td><span class="badge bp">必须</span></td><td>比单门方案多约 MAD 5,000</td></tr>
+    <tr><td>地面（微水泥+瓷砖）</td><td>18,000</td><td><span class="badge bp">必须</span></td><td>美甲区微水泥+饮品区防水防滑砖</td></tr>
+    <tr><td>墙面哑光奶油漆</td><td>10,000</td><td><span class="badge bp">必须</span></td><td>全场奶油白，低成本高效果</td></tr>
+    <tr><td>苔藓打卡背景墙</td><td>40,000</td><td><span class="badge bt">推荐</span></td><td>保鲜苔藓+黄铜立体字+灯带，传播核心</td></tr>
+    <tr><td>高显色灯光（美甲区）</td><td>20,000</td><td><span class="badge bp">必须</span></td><td>CRI≥95冷白光，甲色判断关键</td></tr>
+    <tr><td>饮品区暖光+藤编吊灯</td><td>12,000</td><td><span class="badge bt">推荐</span></td><td>3–5盏藤编灯+轨道灯，ins氛围感</td></tr>
+    <tr><td>水电改造（含卫生间+饮品区水管）</td><td>22,000</td><td><span class="badge bp">必须</span></td><td>全场重新布电+卫生间+饮品区水管接口</td></tr>
+    <tr><td>空调/通风系统</td><td>15,000</td><td><span class="badge bp">必须</span></td><td>美甲区独立通风，除甲油味</td></tr>
+    <tr><td>家具软装</td><td>18,000</td><td><span class="badge bp">必须</span></td><td>4把美甲椅、原木吧台、等候桌椅</td></tr>
+    <tr><td>黄铜五金件</td><td>8,000</td><td><span class="badge bt">推荐</span></td><td>水龙头、门把手、灯具细节</td></tr>
+  </table>
+
+  <div class="info-box ib-amber" style="margin-top:12px">⚠️ 若预算紧张，优先保障「必须」项目（约MAD 125,000）；「推荐」项目可在开业后3个月追加，不影响正常开业。</div>
+</div>
+
+<!-- ══════════════════ TAB 6: PRICING ══════════════════ -->
+<div class="section" id="tab-pricing">
+  <div class="sh1">六、定价策略</div>
+
+  <div class="info-box ib-teal">定价定位：美甲参考卡萨布兰卡本地均价，中国技术溢价支撑30–50%的定价优势，目标月均美甲客单价 <strong>MAD 250 以上</strong>。饮品以在摩中国居民心理价位（国内奶茶价格×2–3倍）为基准定价。</div>
+
+  <div class="sh2">美甲服务定价（MAD）</div>
+  <table class="tbl">
+    <tr><th>分类</th><th>服务项目</th><th>建议定价</th><th>毛利率</th></tr>
+    <tr><td><span class="badge bg-">基础</span></td><td>基础修甲（Manucure）</td><td>MAD 80–120</td><td>约 70%</td></tr>
+    <tr><td><span class="badge bg-">基础</span></td><td>甲油胶（Gel couleur）</td><td>MAD 150–200</td><td>约 75%</td></tr>
+    <tr><td><span class="badge bg-">基础</span></td><td>卸甲+补做</td><td>MAD 100–150</td><td>约 70%</td></tr>
+    <tr><td><span class="badge bg-">基础</span></td><td>脚部美甲（Pédicure）</td><td>MAD 130–180</td><td>约 72%</td></tr>
+    <tr><td><span class="badge bp">高端</span></td><td>日系延长甲/贴片甲</td><td>MAD 300–450</td><td>约 80%</td></tr>
+    <tr><td><span class="badge bp">高端</span></td><td>彩绘/手绘图案</td><td>MAD 250–380</td><td>约 82%</td></tr>
+    <tr><td><span class="badge bp">高端</span></td><td>猫眼/渐变/光疗</td><td>MAD 200–280</td><td>约 78%</td></tr>
+    <tr><td><span class="badge" style="background:#FAEEDA;color:#412402">婚礼</span></td><td>新娘美甲全套（手+足）</td><td>MAD 600–900</td><td>约 85%</td></tr>
+    <tr><td><span class="badge" style="background:#FAEEDA;color:#412402">婚礼</span></td><td>伴娘团套餐（4人+）</td><td>每人 MAD 220起</td><td>约 82%</td></tr>
+  </table>
+
+  <div class="sh2" style="margin-top:20px">饮品定价（MAD）</div>
+  <table class="tbl tbl-tea">
+    <tr><th>品类</th><th>代表产品</th><th>定价（MAD）</th><th>目标客群</th></tr>
+    <tr><td><span class="badge bq">奶茶</span></td><td>珍珠奶茶、芋泥奶茶、黑糖厚乳</td><td>30–45</td><td>在摩中国人、本地年轻女性</td></tr>
+    <tr><td><span class="badge bq">果咖</span></td><td>气泡美式+水果、冷萃果茶、生椰拿铁</td><td>35–55</td><td>在摩中国人、ins打卡客群</td></tr>
+    <tr><td><span class="badge bg-">精品咖啡</span></td><td>拿铁、手冲、美式</td><td>25–35</td><td>本地中产女性（等候引流）</td></tr>
+    <tr><td><span class="badge bt">企业团购</span></td><td>定制套餐，10杯起订，免费配送</td><td>均价22–35/杯</td><td>中资企业、工程项目部</td></tr>
+    <tr><td><span class="badge bg-">联合套餐</span></td><td>美甲+饮品优惠组合</td><td>美甲减MAD 20</td><td>所有进店客户</td></tr>
+  </table>
+
+  <div class="sh2" style="margin-top:20px">会员与套餐策略</div>
+  <table class="tbl tbl-amber">
+    <tr><th>产品</th><th>价格（MAD）</th><th>核心目的</th></tr>
+    <tr><td>月度会员卡（4次基础甲油胶）</td><td>550</td><td>锁客复购，稳定现金流，预计贡献40%月营收</td></tr>
+    <tr><td>季度礼品卡</td><td>400–800</td><td>节假日引新客，Aid节/婚礼季重点推</td></tr>
+    <tr><td>新客首次体验价</td><td>甲油胶MAD 120</td><td>低门槛引流，预期转化率50%+</td></tr>
+    <tr><td>企业团购季度合同</td><td>按量×均价×折扣</td><td>锁定固定收入，增加续单黏性</td></tr>
+    <tr><td>婚礼美甲套餐</td><td>定制报价</td><td>单笔营收可达MAD 2,000+，强口碑效应</td></tr>
+  </table>
+</div>
+
+<!-- ══════════════════ TAB 7: PROFIT TREND (NEW) ══════════════════ -->
+<div class="section" id="tab-profit">
+  <div class="sh1">七、盈利趋势深度分析（新增）</div>
+
+  <div class="sh2">月度营收结构（升级双板块）</div>
+  <table class="tbl tbl-charcoal">
+    <tr><th>收入来源</th><th>保守（MAD）</th><th>基准（MAD）</th><th>良好（MAD）</th><th>理想（MAD）</th></tr>
+    <tr><td>💅 美甲服务</td><td>12,000</td><td>22,000</td><td>35,000</td><td>52,000</td></tr>
+    <tr><td>🧋 中式饮品零售</td><td>2,000</td><td>4,500</td><td>7,500</td><td>11,000</td></tr>
+    <tr><td>🏢 企业团购</td><td>1,500</td><td>3,500</td><td>6,000</td><td>8,000</td></tr>
+    <tr><td>☕ 精品咖啡</td><td>500</td><td>900</td><td>1,300</td><td>2,000</td></tr>
+    <tr style="background:var(--charcoal);color:#fff"><td><strong>月总营收</strong></td><td><strong>16,000</strong></td><td><strong>30,900</strong></td><td><strong>49,800</strong></td><td><strong>73,000</strong></td></tr>
+    <tr style="background:#1a1a18;color:#9FE1CB"><td><strong>月净利润</strong></td><td class="profit-neg" style="color:#ff8888"><strong>-12,700</strong></td><td style="color:#aaa"><strong>+2,200</strong></td><td class="profit-pos" style="color:#5DCAA5"><strong>+21,100</strong></td><td class="profit-pos" style="color:#5DCAA5"><strong>+44,300</strong></td></tr>
+  </table>
+  <div style="font-size:12px;color:var(--gray);margin-top:4px">月成本基准：约MAD 28,700（含饮品原材料升级后）</div>
+
+  <div class="sh2" style="margin-top:24px">18个月盈利走势预测</div>
+  <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+
+  <div class="sh2">分阶段盈利预判</div>
+  <div class="trend-stages">
+    <div class="trend-stage" style="border-color:var(--amber)">
+      <div class="ts-period" style="color:var(--amber-dk)">第1–3月 · 冷启动期</div>
+      <div class="ts-rev">MAD 8K–18K</div>
+      <div class="ts-label">口碑积累、博主探店、团购首批拜访；预期处于亏损或微盈状态</div>
+    </div>
+    <div class="trend-stage" style="border-color:var(--pink)">
+      <div class="ts-period" style="color:var(--pink-dk)">第4–6月 · 爬坡期</div>
+      <div class="ts-rev">MAD 20K–35K</div>
+      <div class="ts-label">会员体系启动、团购签约3家+、美甲预约率明显上升；向盈亏平衡线逼近</div>
+    </div>
+    <div class="trend-stage" style="border-color:var(--teal)">
+      <div class="ts-period" style="color:var(--teal-dk)">第7–12月 · 稳定盈利期</div>
+      <div class="ts-rev">MAD 38K–55K</div>
+      <div class="ts-label">婚礼季高峰、团购MAD 5K+月收入、会员复购40%+；净利润MAD 10K–25K</div>
+    </div>
+    <div class="trend-stage" style="border-color:var(--tea)">
+      <div class="ts-period" style="color:var(--tea-dk)">第13–18月 · 扩张期</div>
+      <div class="ts-rev">MAD 50K–80K</div>
+      <div class="ts-label">VIP包间上线、第二选址评估、饮品品牌独立运营探索</div>
+    </div>
+  </div>
+
+  <div class="sh2">营收结构对比图（饮品板块贡献）</div>
+  <div class="chart-wrap"><canvas id="revStructChart"></canvas></div>
+
+  <div class="sh2" style="margin-top:20px">加速回本的五个关键杠杆</div>
+  <table class="tbl tbl-teal">
+    <tr><th>#</th><th>杠杆</th><th>目标指标</th><th>预期月收入增量</th></tr>
+    <tr><td>1</td><td>美甲高价服务占比提升</td><td>彩绘/延长甲占总订单≥30%，月均客单价突破MAD 260</td><td>+MAD 3,000–6,000</td></tr>
+    <tr><td>2</td><td>企业团购固定收入</td><td>开业前签约3家，稳定期签约8家+</td><td>+MAD 3,000–8,000</td></tr>
+    <tr><td>3</td><td>婚礼美甲专项（5–9月旺季）</td><td>每月承接2–3场，单笔MAD 1,500–3,000</td><td>+MAD 3,000–9,000</td></tr>
+    <tr><td>4</td><td>会员锁客提高复购</td><td>会员卡覆盖30–40%顾客，月会员收入占比40%+</td><td>降低获客成本20–30%</td></tr>
+    <tr><td>5</td><td>饮品淡季对冲美甲波动</td><td>美甲淡季（10–12月）加大团购推广，弥补营收缺口</td><td>淡季补偿MAD 2,000–5,000</td></tr>
+  </table>
+</div>
+
+<!-- ══════════════════ TAB 8: COMPETITION (NEW) ══════════════════ -->
+<div class="section" id="tab-competition">
+  <div class="sh1">八、竞争格局与差异化分析（新增）</div>
+
+  <div class="sh2">美甲市场竞争现状（卡萨布兰卡）</div>
+  <table class="tbl tbl-charcoal">
+    <tr><th>竞争类型</th><th>代表区域</th><th>定价水平</th><th>核心弱点</th></tr>
+    <tr><td><strong>本地传统美甲沙龙</strong></td><td>Maarif、Derb Omar</td><td>MAD 60–150（低价）</td><td>技术有限，无日系/中国技术，无品牌感，无私密分区</td></tr>
+    <tr><td><strong>中国老板美甲店（已存在）</strong></td><td>Racine附近（约1家）</td><td>MAD 150–350（中价）</td><td>运营粗放，品牌形象弱，无饮品配套，私密感差</td></tr>
+    <tr><td><strong>高端美容沙龙（含美甲）</strong></td><td>Gauthier、Ain Diab</td><td>MAD 300–600（高价）</td><td>美甲非主营，技术不专业，更多做综合美容</td></tr>
+    <tr style="background:var(--teal-lt)"><td><strong>ATELIER VERT</strong></td><td>Ain Diab / Racine</td><td><strong>MAD 150–450（中高价）</strong></td><td><span style="color:var(--teal-dk)">差异化填补：中国技术+私密+中式饮品</span></td></tr>
+  </table>
+
+  <div class="sh2" style="margin-top:20px">中式饮品市场竞争现状</div>
+  <div class="risk-grid">
+    <div class="risk-card risk-low"><div class="risk-title">✓ 本地奶茶竞争</div><div class="risk-body">卡萨布兰卡现有中国老板奶茶店约1–2家，以外卖/外带为主，无门店体验感，品类单一，无企业服务。</div></div>
+    <div class="risk-card risk-low"><div class="risk-title">✓ 国际品牌缺席</div><div class="risk-body">Gong Cha、HEYTEA等国际奶茶品牌尚未进入摩洛哥，进入成本高、周期长（预计3年+），先发优势窗口明显。</div></div>
+    <div class="risk-card risk-low"><div class="risk-title">✓ 企业团购空白</div><div class="risk-body">目前无任何店铺系统性服务中资企业茶歇，先切入者可快速积累固定客户壁垒，预计持续2–3年先发优势。</div></div>
+  </div>
+
+  <div class="sh2">ATELIER VERT 核心竞争优势雷达</div>
+  <div class="chart-wrap" style="height:320px"><canvas id="radarChart"></canvas></div>
+
+  <div class="sh2">竞争优势详细说明</div>
+  <table class="tbl tbl-teal">
+    <tr><th>竞争维度</th><th>ATELIER VERT 优势</th><th>可持续性</th></tr>
+    <tr><td>技术壁垒</td><td>中国师傅/学徒驻店，日系延长甲、彩绘技术本地稀缺，短期内难以复制</td><td>★★★★★ 极强</td></tr>
+    <tr><td>私密体验</td><td>前后区完全分离设计，满足穆斯林女性摘头巾的私密需求，本地竞争对手几乎无一做到</td><td>★★★★★ 极强</td></tr>
+    <tr><td>品牌视觉</td><td>Crème Forest美学+6处打卡点，ins传播力强，形成天然流量飞轮</td><td>★★★★ 强</td></tr>
+    <tr><td>双客群结构</td><td>本地女性（美甲）+ 在摩中国人（饮品+团购），抗风险能力显著优于单一客群</td><td>★★★★★ 极强</td></tr>
+    <tr><td>团购先发优势</td><td>中资企业茶歇需求真实存在但供给空白，先切入者快速积累固定客户壁垒</td><td>★★★★ 强</td></tr>
+    <tr><td>供应链成本</td><td>投资人中摩往返，国内带入奶茶原料，成本低于本地采购30%+</td><td>★★★ 中等</td></tr>
+  </table>
+
+  <div class="sh2" style="margin-top:20px">竞争风险应对</div>
+  <table class="tbl tbl-amber">
+    <tr><th>风险</th><th>风险等级</th><th>应对策略</th></tr>
+    <tr><td>同类中国美甲店跟进模仿</td><td><span class="badge" style="background:#FAEEDA;color:#412402">中等</span></td><td>品牌设计差异化+会员锁客+VIP包间（难以快速复制的高端壁垒）</td></tr>
+    <tr><td>国际奶茶品牌进入摩洛哥</td><td><span class="badge bt">低（中期）</span></td><td>进入成本高周期长；届时本店已完成品牌口碑积累，可升级为加盟/合作关系</td></tr>
+    <tr><td>奶茶原料进口受阻</td><td><span class="badge bt">低（可控）</span></td><td>提前研究海关规定，建立3个月+库存，开发本地替代原料</td></tr>
+    <tr><td>企业团购订单流失</td><td><span class="badge bt">低</span></td><td>签订季度预付合同，提供定制包装+企业logo印杯增值服务</td></tr>
+  </table>
+</div>
+
+<!-- ══════════════════ TAB 9: BREAKEVEN ══════════════════ -->
+<div class="section" id="tab-breakeven">
+  <div class="sh1">九、盈亏平衡测算（修订版）</div>
+
+  <div class="sh2">交互测算 — 拖动调整参数</div>
+  <div class="card">
+    <div class="slider-row"><label>月接客量（美甲）</label><input type="range" min="60" max="300" value="150" step="5" id="sClients" oninput="calc()"><span class="val" id="vClients">150 单</span></div>
+    <div class="slider-row"><label>平均美甲客单价</label><input type="range" min="120" max="400" value="220" step="10" id="sAvg" oninput="calc()"><span class="val" id="vAvg">MAD 220</span></div>
+    <div class="slider-row"><label>月租金</label><input type="range" min="5000" max="12000" value="7000" step="500" id="sRent" oninput="calc()"><span class="val" id="vRent">MAD 7,000</span></div>
+    <div class="slider-row"><label>🧋饮品月收入</label><input type="range" min="0" max="15000" value="4000" step="200" id="sCafe" oninput="calc()"><span class="val" id="vCafe">MAD 4,000</span></div>
+    <div class="slider-row"><label>🏢团购月收入</label><input type="range" min="0" max="12000" value="3000" step="200" id="sGroupbuy" oninput="calc()"><span class="val" id="vGroupbuy">MAD 3,000</span></div>
+  </div>
+  <div class="be-boxes" id="beBoxes">
+    <div class="be-box" style="background:var(--teal-lt)"><div class="bnum" id="beRev" style="color:var(--teal-dk)">—</div><div class="blbl" style="color:var(--teal-dk)">月总营收</div></div>
+    <div class="be-box" style="background:var(--beige)"><div class="bnum" id="beCost">—</div><div class="blbl" style="color:var(--gray)">月总成本</div></div>
+    <div class="be-box" id="beProfitBox" style="background:var(--pink-lt)"><div class="bnum" id="beProfit" style="color:var(--pink-dk)">—</div><div class="blbl" id="beProfitLbl" style="color:var(--pink-dk)">月净利润</div></div>
+    <div class="be-box" style="background:#E6F1FB"><div class="bnum" id="beROI" style="color:#185FA5">—</div><div class="blbl" style="color:#0C447C">回本周期</div></div>
+  </div>
+  <div style="margin-bottom:20px">
+    <div style="font-size:12px;color:var(--gray);margin-bottom:6px">收支比例</div>
+    <div style="height:10px;background:var(--beige);border-radius:5px;overflow:hidden;display:flex">
+      <div id="barCost" style="background:var(--gray-lt);transition:width .3s"></div>
+      <div id="barProfit" style="background:var(--teal);transition:width .3s"></div>
+    </div>
+  </div>
+
+  <div class="sh2">场景对比分析（修订版）</div>
+  <table class="tbl tbl-charcoal">
+    <tr><th>场景</th><th>美甲收入</th><th>饮品+团购</th><th>月总营收</th><th>月成本</th><th>月利润</th><th>回本</th></tr>
+    <tr><td><span class="badge bg-">保守</span></td><td>MAD 12,000</td><td>MAD 4,000</td><td>MAD 16,000</td><td>MAD 28,700</td><td class="profit-neg">-MAD 12,700</td><td>—</td></tr>
+    <tr><td><span class="badge ba">基准</span></td><td>MAD 22,000</td><td>MAD 8,900</td><td>MAD 30,900</td><td>MAD 28,700</td><td style="color:var(--amber-dk);font-weight:600">+MAD 2,200</td><td>约 120 月</td></tr>
+    <tr><td><span class="badge bt">良好</span></td><td>MAD 35,000</td><td>MAD 14,800</td><td>MAD 49,800</td><td>MAD 28,700</td><td class="profit-pos" style="font-weight:600">+MAD 21,100</td><td>约 14 月</td></tr>
+    <tr><td><span class="badge bp">理想</span></td><td>MAD 52,000</td><td>MAD 21,000</td><td>MAD 73,000</td><td>MAD 28,700</td><td class="profit-pos" style="font-weight:600">+MAD 44,300</td><td>约 7 月</td></tr>
+  </table>
+
+  <div class="sh2" style="margin-top:20px">月度成本明细（修订版）</div>
+  <table class="tbl tbl-amber">
+    <tr><th>成本项目</th><th>低估（MAD）</th><th>中估（MAD）</th><th>变化说明</th></tr>
+    <tr><td>店面租金</td><td>6,000</td><td>8,000</td><td>同原版</td></tr>
+    <tr><td>本地工人薪资×2</td><td>5,000</td><td>6,000</td><td>同原版</td></tr>
+    <tr><td>中国学徒工资</td><td>4,000</td><td>4,500</td><td>同原版</td></tr>
+    <tr><td>住宿补贴</td><td>2,000</td><td>2,500</td><td>同原版</td></tr>
+    <tr><td>水电+网络</td><td>1,200</td><td>1,500</td><td>同原版</td></tr>
+    <tr><td>美甲耗材补充</td><td>2,000</td><td>2,500</td><td>同原版</td></tr>
+    <tr style="background:var(--tea-lt)"><td>🧋饮品原材料（新增）</td><td>1,200</td><td>1,500</td><td>奶茶配料+杯具补充，原料成本低</td></tr>
+    <tr><td>精品咖啡原材料</td><td>400</td><td>600</td><td>较原版减少（咖啡为辅）</td></tr>
+    <tr><td>社媒推广/KOL</td><td>500</td><td>800</td><td>同原版</td></tr>
+    <tr><td>杂费/备用</td><td>500</td><td>800</td><td>同原版</td></tr>
+    <tr style="background:var(--amber-lt)"><td><strong>合计</strong></td><td><strong>22,800</strong></td><td><strong>28,700</strong></td><td>较原版增加约 MAD 1,300</td></tr>
+  </table>
+
+  <div class="info-box ib-pink" style="margin-top:12px">⚠️ 关键判断：基准场景利润极薄。<strong>团购固定收入是最快拉升盈亏平衡线的工具</strong>——若签约3家企业客户（月收入MAD 3,000），盈亏平衡所需美甲月接客量可降低约15单。</div>
+
+  <div class="sh2" style="margin-top:20px">利润场景对比图</div>
+  <div class="chart-wrap"><canvas id="profitChart"></canvas></div>
+</div>
+
+<!-- ══════════════════ TAB 10: RISK + TIMELINE ══════════════════ -->
+<div class="section" id="tab-risk">
+  <div class="sh1">十、风险评估与时间规划</div>
+
+  <div class="sh2">主要风险评估（修订版）</div>
+  <div class="risk-grid">
+    <div class="risk-card risk-high"><div class="risk-title">⚠️ 签证/法律风险（高）</div><div class="risk-body">中国学徒无合法工作资质，面临罚款或驱逐。<br><strong>应对：</strong>提前6个月委托当地律师，预留MAD 3,000–5,000。</div></div>
+    <div class="risk-card risk-high"><div class="risk-title">⚠️ 远程管理风险（高）</div><div class="risk-body">早期放权导致品质下滑、客流流失。<br><strong>应对：</strong>前6个月高频驻店，建立SOP后逐步远程；安装监控+数字化收银。</div></div>
+    <div class="risk-card risk-med"><div class="risk-title">⚡ 客流不稳定（中）</div><div class="risk-body">开业初期美甲客流低迷，固定成本压力大。<br><strong>应对：</strong>团购收入提供最低保底（MAD 2,000+/月），流动备用金MAD 55,000支撑≥2月。</div></div>
+    <div class="risk-card risk-med"><div class="risk-title">⚡ 客单价不达标（中）</div><div class="risk-body">美甲客单价停留在MAD 180–200，盈利极薄。<br><strong>应对：</strong>开业即主推高价服务，不等口碑建立后再涨价；目标：开业3月内均价突破MAD 250。</div></div>
+    <div class="risk-card risk-low"><div class="risk-title">✓ 饮品原料进口风险（低）</div><div class="risk-body">核心原料进口受阻影响出品。<br><strong>应对：</strong>提前了解海关规定，建立3月+库存，开发本地替代原料备用。</div></div>
+    <div class="risk-card risk-low"><div class="risk-title">✓ 竞争风险（低）</div><div class="risk-body">附近出现同类竞争对手（美甲或奶茶）。<br><strong>应对：</strong>技术壁垒+私密感+品牌设计+会员锁客构成多重护城河；团购客户合同锁定。</div></div>
+  </div>
+
+  <div class="sh2" style="margin-top:20px">18个月开业时间线（修订版）</div>
+  <div class="timeline">
+    <div class="tl-item"><div class="tl-dot"></div><div class="tl-phase">第1–2个月 · 筹备期</div><div class="tl-content">公司注册（SARL）、工作许可申请；选址看铺、签约；确定装修方案；<strong>奶茶原料供应链调研+海关规定核查</strong>；Instagram账号注册预热</div></div>
+    <div class="tl-item"><div class="tl-dot"></div><div class="tl-phase">第3–4个月 · 装修期</div><div class="tl-content">装修施工（约45–60天）；设备采购（含饮品设备）；中国学徒抵摩；本地工人招募；<strong>开始主动拜访中资企业团购客户</strong>；持续Instagram内容输出</div></div>
+    <div class="tl-item"><div class="tl-dot" style="background:var(--tea)"></div><div class="tl-phase">第5个月 · 试营业</div><div class="tl-content">软开业2–4周，美甲+饮品同步测试运营；本地博主+中国社群KOL探店；<strong>团购客户首批签约目标：3家+</strong>；定价测试与服务流程优化</div></div>
+    <div class="tl-item"><div class="tl-dot"></div><div class="tl-phase">第6个月 · 正式开业</div><div class="tl-content">正式开业+开业优惠活动；会员卡体系上线；婚礼美甲套餐重点推广；<strong>团购配送体系正式启动</strong></div></div>
+    <div class="tl-item"><div class="tl-dot" style="background:var(--teal)"></div><div class="tl-phase">第7–12个月 · 稳定期</div><div class="tl-content">月营收目标超MAD 3万+；会员复购率40%+；团购客户扩展至5家+；评估VIP包间改造时机；中国师傅轮驻频次可降低</div></div>
+    <div class="tl-item"><div class="tl-dot" style="background:var(--teal)"></div><div class="tl-phase">第13–18个月 · 扩张评估</div><div class="tl-content">若回本顺利，评估Maarif/Gauthier第二家店；探索饮品品牌单独运营或加盟模式；探索美甲培训课程变现</div></div>
+  </div>
+
+  <div class="sh2" style="margin-top:24px">核心数据汇总（修订版）</div>
+  <table class="tbl tbl-charcoal">
+    <tr><th>指标</th><th>数值</th></tr>
+    <tr><td>总投资预算</td><td><strong>MAD 350,000（约¥22.5万）</strong></td></tr>
+    <tr><td>饮品设备预算（升级后）</td><td>MAD 30,600（较原版增加约MAD 10,600）</td></tr>
+    <tr><td>月固定成本（中估，含饮品原材料）</td><td>约 MAD 28,700</td></tr>
+    <tr><td>目标月均美甲客单价</td><td>MAD 250 以上</td></tr>
+    <tr><td>饮品+团购月收入目标（稳定期）</td><td>MAD 8,000–15,000</td></tr>
+    <tr><td>盈亏平衡月总营收</td><td>约 MAD 28,700</td></tr>
+    <tr><td>良好场景月净利润</td><td>约 MAD 21,100（美甲180单+饮品&团购MAD 14,800）</td></tr>
+    <tr><td>目标回本周期</td><td>12–18个月（良好场景）</td></tr>
+    <tr><td>企业团购目标（稳定期）</td><td>8家以上固定客户，月收入MAD 6,000–12,000</td></tr>
+    <tr><td>推荐选址</td><td>Ain Diab 或 Racine，月租 MAD 6,000–9,000</td></tr>
+    <tr><td>设计风格</td><td>Crème Forest（奶油白×原木×森林绿）</td></tr>
+    <tr><td>品牌占位名</td><td>ATELIER VERT（法语：绿色工作室）</td></tr>
+  </table>
+</div>
+
+<script>
+// ── TAB SWITCHING ──
+function showTab(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  const btns=document.querySelectorAll('.nav-btn');
+  const map={overview:0,location:1,drinks:2,layout:3,renovation:4,pricing:5,profit:6,competition:7,breakeven:8,risk:9};
+  btns[map[id]].classList.add('active');
+  if(id==='layout') drawFloorPlan();
+  if(id==='renovation') initBudgetChart();
+  if(id==='location') initRentChart();
+  if(id==='profit'){initTrendChart();initRevStructChart();}
+  if(id==='competition') initRadarChart();
+  if(id==='drinks') initGroupbuyChart();
+  if(id==='breakeven'){calc();initProfitChart();}
+}
+
+// ── FLOOR PLAN ──
+function drawFloorPlan(){
+  const c=document.getElementById('floorCanvas');
+  const ctx=c.getContext('2d');
+  const W=740,H=680;
+  ctx.clearRect(0,0,W,H);
+  const CREAM='#F5F0E8',BEIGE='#EDE8DF',OAK='#C8B89A',OAK_DK='#B0A08A';
+  const GREEN='#7A9E7E',GREEN_DK='#4A7055',MOSS='#4A7055';
+  const PINK='#D4537E',PINK_LT='#FBEAF0',PINK_DK='#993556';
+  const TEAL='#1D9E75',TEAL_LT='#E1F5EE';
+  const TEA='#9B59B6',TEA_LT='#F5EEF8';
+  const AMBER='#EF9F27',CHARCOAL='#2C2C2A',GRAY='#5F5E5A';
+  const MICRO='#F0EBE3',LINE='#E5DFD7';
+
+  ctx.fillStyle=CREAM; ctx.strokeStyle=CHARCOAL; ctx.lineWidth=4;
+  ctx.beginPath(); ctx.roundRect(40,20,500,620,4); ctx.fill(); ctx.stroke();
+  ctx.fillStyle=GRAY; ctx.font='12px Arial'; ctx.textAlign='center';
+  ctx.fillText('— 街道 · 入口方向 —',290,14);
+  ctx.fillStyle=CREAM; ctx.fillRect(212,18,90,8);
+  ctx.strokeStyle=CHARCOAL; ctx.lineWidth=4;
+  ctx.beginPath(); ctx.moveTo(212,20); ctx.lineTo(212,24); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(302,20); ctx.lineTo(302,24); ctx.stroke();
+
+  // ── DRINKS ZONE (upgraded from cafe) ──
+  ctx.fillStyle=TEA_LT; ctx.fillRect(40,20,500,155);
+  ctx.strokeStyle='#C39BD3'; ctx.lineWidth=0.5;
+  for(let x=40;x<=540;x+=75){ctx.beginPath();ctx.moveTo(x,20);ctx.lineTo(x,175);ctx.stroke();}
+  for(let y=20;y<=175;y+=50){ctx.beginPath();ctx.moveTo(40,y);ctx.lineTo(540,y);ctx.stroke();}
+
+  // bar counter (drinks)
+  ctx.fillStyle=OAK; ctx.strokeStyle=CHARCOAL; ctx.lineWidth=1.5;
+  ctx.fillRect(58,34,140,56); ctx.strokeRect(58,34,140,56);
+  for(let x=68;x<198;x+=16){ctx.strokeStyle=OAK_DK;ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(x,34);ctx.lineTo(x,90);ctx.stroke();}
+  // milk tea cups sketch
+  [0,1,2].forEach(i=>{
+    ctx.fillStyle=['#D7BDE2','#A9CCE3','#F9E79F'][i];
+    ctx.beginPath(); ctx.arc(75+i*22,65,8,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle=OAK_DK; ctx.lineWidth=1; ctx.stroke();
+  });
+  ctx.fillStyle=GRAY; ctx.font='bold 11px Arial'; ctx.textAlign='center';
+  ctx.fillText('🧋 饮品出品台',128,105); ctx.font='10px Arial'; ctx.fillText('奶茶·果咖·咖啡',128,118);
+
+  // tables
+  [[280,95],[400,95]].forEach(([cx,cy])=>{
+    ctx.fillStyle=BEIGE; ctx.strokeStyle=OAK; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(cx,cy,28,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle=OAK_DK; ctx.beginPath(); ctx.arc(cx,cy,14,0,Math.PI*2); ctx.fill();
+    [[0,-36],[0,36],[-36,0],[36,0]].forEach(([dx,dy])=>{
+      ctx.fillStyle=GREEN; ctx.strokeStyle=GREEN_DK; ctx.lineWidth=0.5;
+      ctx.beginPath(); ctx.ellipse(cx+dx,cy+dy,13,8,dx===0?0:Math.PI/2,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    });
+  });
+
+  ctx.fillStyle=TEA; ctx.beginPath(); ctx.ellipse(512,142,14,18,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#C39BD3'; ctx.beginPath(); ctx.ellipse(505,130,9,12,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#854F0B'; ctx.fillRect(505,158,8,14);
+
+  ctx.fillStyle=CHARCOAL; ctx.font='bold 12px Arial'; ctx.textAlign='center';
+  ctx.fillText('饮品区（奶茶+果咖+咖啡）',290,158);
+  ctx.fillStyle=GRAY; ctx.font='10px Arial'; ctx.fillText('约13㎡ · 临街 · 原木吧台 · 藤编吊灯',290,170);
+
+  // PARTITION WALL
+  ctx.fillStyle=OAK; ctx.strokeStyle=CHARCOAL; ctx.lineWidth=2;
+  ctx.fillRect(40,175,500,13); ctx.strokeRect(40,175,500,13);
+  ctx.fillStyle=CREAM; ctx.fillRect(110,175,80,13);
+  ctx.strokeStyle=OAK; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(150,175,40,Math.PI,0); ctx.stroke();
+  ctx.fillStyle=AMBER; ctx.font='10px Arial'; ctx.textAlign='center';
+  ctx.fillText('弧形门 ★',150,200);
+  ctx.fillStyle=CREAM; ctx.fillRect(350,175,54,13);
+  ctx.strokeStyle=TEAL; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(377,175,27,Math.PI,0); ctx.stroke();
+  ctx.fillStyle=TEAL; ctx.font='9px Arial'; ctx.textAlign='center';
+  ctx.fillText('饮品侧↓',377,170);
+
+  // TOILET
+  ctx.fillStyle=MICRO; ctx.strokeStyle=TEAL; ctx.lineWidth=2.5;
+  ctx.fillRect(350,188,190,148); ctx.strokeRect(350,188,190,148);
+  ctx.strokeStyle=LINE; ctx.lineWidth=0.5;
+  [220,260,300].forEach(y=>{ctx.beginPath();ctx.moveTo(350,y);ctx.lineTo(540,y);ctx.stroke();});
+  [385,420,455,490].forEach(x=>{ctx.beginPath();ctx.moveTo(x,188);ctx.lineTo(x,336);ctx.stroke();});
+  ctx.fillStyle=BEIGE; ctx.strokeStyle=OAK; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.ellipse(378,232,20,28,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.fillRect(358,254,40,14);
+  ctx.fillStyle=BEIGE; ctx.strokeStyle=OAK; ctx.lineWidth=1;
+  ctx.fillRect(420,200,52,32); ctx.strokeRect(420,200,52,32);
+  ctx.fillStyle=CREAM; ctx.beginPath(); ctx.arc(446,216,7,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle=OAK; ctx.stroke();
+  ctx.fillStyle=CREAM; ctx.fillRect(330,248,22,52);
+  ctx.strokeStyle=TEAL; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(350,248); ctx.lineTo(350,300); ctx.stroke();
+  ctx.beginPath(); ctx.arc(350,248,52,Math.PI/2,Math.PI); ctx.stroke();
+  ctx.fillStyle=TEAL; ctx.font='9px Arial'; ctx.textAlign='right';
+  ctx.fillText('←美甲侧',345,278);
+  ctx.fillStyle='#085041'; ctx.font='bold 11px Arial'; ctx.textAlign='center';
+  ctx.fillText('共用卫生间',445,300);
+  ctx.fillStyle=TEAL; ctx.font='9px Arial';
+  ctx.fillText('上门→饮品  左门→美甲',445,314); ctx.fillText('约5㎡',445,326);
+
+  // STORAGE
+  ctx.fillStyle=BEIGE; ctx.strokeStyle=OAK_DK; ctx.lineWidth=1.5;
+  ctx.fillRect(350,336,190,304); ctx.strokeRect(350,336,190,304);
+  [356,376,396].forEach(y=>{
+    ctx.fillStyle=OAK; ctx.fillRect(362,y,154,10); ctx.strokeStyle=OAK_DK; ctx.lineWidth=0.5; ctx.strokeRect(362,y,154,10);
+  });
+  [PINK,'#7F77DD',AMBER,TEAL,'#9B59B6'].forEach((c,i)=>{
+    ctx.fillStyle=c; ctx.beginPath(); ctx.arc(372+i*25,370,5,0,Math.PI*2); ctx.fill();
+  });
+  ctx.fillStyle=BEIGE; ctx.strokeStyle=OAK; ctx.lineWidth=1;
+  ctx.fillRect(362,420,70,50); ctx.strokeRect(362,420,70,50);
+  ctx.fillStyle=GRAY; ctx.font='10px Arial'; ctx.textAlign='center'; ctx.fillText('换衣间',397,449);
+  ctx.fillStyle=TEA_LT; ctx.strokeStyle='#C39BD3'; ctx.lineWidth=1;
+  ctx.fillRect(362,480,154,40); ctx.strokeRect(362,480,154,40);
+  ctx.fillStyle=TEA; ctx.font='10px Arial'; ctx.textAlign='center';
+  ctx.fillText('🧋 饮品原料库',445,505);
+  ctx.setLineDash([5,4]); ctx.strokeStyle=PINK; ctx.lineWidth=2;
+  ctx.strokeRect(362,532,154,90); ctx.setLineDash([]);
+  ctx.fillStyle=PINK_DK; ctx.font='bold 11px Arial'; ctx.textAlign='center';
+  ctx.fillText('VIP预留',445,574); ctx.fillStyle=PINK; ctx.font='10px Arial';
+  ctx.fillText('后期扩包间·约8㎡',445,588);
+  ctx.fillStyle=CHARCOAL; ctx.font='bold 11px Arial'; ctx.textAlign='center';
+  ctx.fillText('储物后台',445,410); ctx.fillStyle=GRAY; ctx.font='9px Arial';
+  ctx.fillText('耗材库',445,422);
+
+  // NAIL ZONE
+  ctx.fillStyle=MICRO; ctx.fillRect(40,188,310,452);
+  ctx.strokeStyle=LINE; ctx.lineWidth=0.5;
+  [250,310,370,430,490].forEach(y=>{ctx.beginPath();ctx.moveTo(40,y);ctx.lineTo(350,y);ctx.stroke();});
+  [103,166,230,296].forEach(x=>{ctx.beginPath();ctx.moveTo(x,188);ctx.lineTo(x,640);ctx.stroke();});
+
+  // moss wall
+  ctx.fillStyle=MOSS; ctx.fillRect(40,188,310,30);
+  for(let i=0;i<40;i++){
+    const mx=50+Math.random()*290, my=190+Math.random()*24, r=3+Math.random()*7;
+    ctx.fillStyle=['#7A9E7E','#5DCAA5','#97C459','#1D9E75','#4A7055'][Math.floor(Math.random()*5)];
+    ctx.beginPath(); ctx.arc(mx,my,r,0,Math.PI*2); ctx.fill();
+  }
+  ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='bold 11px Arial'; ctx.textAlign='center';
+  ctx.fillText('ATELIER VERT ★ins',195,207);
+
+  // nail stations
+  const stations=[[50,240,'工位 1'],[175,240,'工位 2'],[50,370,'工位 3'],[175,370,'工位 4']];
+  stations.forEach(([sx,sy,label])=>{
+    ctx.fillStyle=BEIGE; ctx.strokeStyle=OAK; ctx.lineWidth=1.5;
+    ctx.fillRect(sx,sy,114,58); ctx.strokeRect(sx,sy,114,58);
+    ctx.fillStyle=GREEN; ctx.strokeStyle=GREEN_DK; ctx.lineWidth=0.8;
+    ctx.fillRect(sx+88,sy+8,20,16); ctx.strokeRect(sx+88,sy+8,20,16);
+    [PINK,'#7F77DD',AMBER,TEAL,'#9B59B6'].forEach((c,i)=>{
+      ctx.fillStyle=c; ctx.beginPath(); ctx.arc(sx+12+i*16,sy+44,5,0,Math.PI*2); ctx.fill();
+    });
+    ctx.strokeStyle=OAK; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(sx+57,sy,30,Math.PI,0); ctx.stroke();
+    ctx.fillStyle=CHARCOAL; ctx.font='bold 10px Arial'; ctx.textAlign='center';
+    ctx.fillText(label,sx+57,sy+26);
+    ctx.fillStyle=GRAY; ctx.font='9px Arial'; ctx.fillText('原木台·弧形镜',sx+57,sy+40);
+    ctx.fillStyle=GREEN; ctx.beginPath(); ctx.ellipse(sx+57,sy+66,20,7,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#F0FAF5'; ctx.font='9px Arial'; ctx.textAlign='center'; ctx.fillText('客椅',sx+57,sy+70);
+  });
+
+  ctx.fillStyle=BEIGE; ctx.strokeStyle=OAK; ctx.lineWidth=1;
+  ctx.fillRect(55,462,240,24); ctx.strokeRect(55,462,240,24);
+  ctx.fillStyle=CHARCOAL; ctx.font='bold 10px Arial'; ctx.textAlign='center';
+  ctx.fillText('手部拍照台  ★ins',175,478);
+
+  [[322,280],[322,402]].forEach(([px,py])=>{
+    ctx.fillStyle=GREEN; ctx.beginPath(); ctx.ellipse(px,py,13,17,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#97C459'; ctx.beginPath(); ctx.ellipse(px-6,py-14,8,11,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#854F0B'; ctx.fillRect(px-4,py+15,8,12);
+  });
+
+  ctx.setLineDash([5,3]); ctx.strokeStyle=OAK; ctx.lineWidth=1.5;
+  ctx.strokeRect(55,500,240,86); ctx.setLineDash([]);
+  ctx.fillStyle=GRAY; ctx.font='bold 11px Arial'; ctx.textAlign='center';
+  ctx.fillText('员工休息角',175,536);
+  ctx.font='10px Arial'; ctx.fillText('小桌·备料·充电·约6㎡',175,552);
+
+  ctx.fillStyle=CHARCOAL; ctx.font='bold 12px Arial'; ctx.textAlign='center';
+  ctx.fillText('美甲私密区（主营业）',190,592);
+  ctx.fillStyle=GRAY; ctx.font='10px Arial';
+  ctx.fillText('约33㎡ · 4工位 · 完全隔断 · 苔藓墙',190,606);
+}
+
+// ── BREAKEVEN CALC ──
+function calc(){
+  const clients=+document.getElementById('sClients').value;
+  const avg=+document.getElementById('sAvg').value;
+  const rent=+document.getElementById('sRent').value;
+  const cafe=+document.getElementById('sCafe').value;
+  const groupbuy=+document.getElementById('sGroupbuy').value;
+  document.getElementById('vClients').textContent=clients+' 单';
+  document.getElementById('vAvg').textContent='MAD '+avg;
+  document.getElementById('vRent').textContent='MAD '+rent.toLocaleString();
+  document.getElementById('vCafe').textContent='MAD '+cafe.toLocaleString();
+  document.getElementById('vGroupbuy').textContent='MAD '+groupbuy.toLocaleString();
+  const rev=clients*avg+cafe+groupbuy;
+  const cost=rent+5000+4000+2000+1200+2000+1500+600+500+500;
+  const profit=rev-cost;
+  const roi=profit>0?Math.ceil(295000/profit):null;
+  document.getElementById('beRev').textContent='MAD '+Math.round(rev).toLocaleString();
+  document.getElementById('beCost').textContent='MAD '+Math.round(cost).toLocaleString();
+  document.getElementById('beProfit').textContent=(profit>=0?'+':'')+'MAD '+Math.round(profit).toLocaleString();
+  document.getElementById('beProfitLbl').textContent=profit>=0?'月净利润':'月亏损';
+  const pb=document.getElementById('beProfitBox');
+  const bpEl=document.getElementById('beProfit');
+  const blEl=document.getElementById('beProfitLbl');
+  if(profit>=0){pb.style.background='#E1F5EE';bpEl.style.color='#0F6E56';blEl.style.color='#085041';}
+  else{pb.style.background='#FCEBEB';bpEl.style.color='#A32D2D';blEl.style.color='#791F1F';}
+  document.getElementById('beROI').textContent=roi?roi+'个月':'亏损中';
+  document.getElementById('beROI').style.color=roi&&roi<=24?'#185FA5':'#888780';
+  const pct=Math.min(100,Math.round(cost/Math.max(rev,1)*100));
+  document.getElementById('barCost').style.width=pct+'%';
+  document.getElementById('barProfit').style.width=Math.max(0,100-pct)+'%';
+}
+
+// ── CHARTS ──
+let chartInstances={};
+function destroyChart(id){if(chartInstances[id]){chartInstances[id].destroy();delete chartInstances[id];}}
+
+function initBudgetChart(){
+  destroyChart('budget');
+  const ctx=document.getElementById('budgetChart').getContext('2d');
+  chartInstances['budget']=new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:['装修施工','美甲设备','饮品设备（升级）','首批耗材','押金证照','品牌机票','流动备用'],
+      datasets:[{data:[125000,60000,30600,30000,26000,21000,54400],
+        backgroundColor:['#D4537E','#1D9E75','#9B59B6','#EF9F27','#7F77DD','#5DCAA5','#D3D1C7'],borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:12},padding:12}}}}
+  });
+}
+
+function initRentChart(){
+  destroyChart('rent');
+  const ctx=document.getElementById('rentChart').getContext('2d');
+  chartInstances['rent']=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['Ain Diab','Racine','Gauthier','Maarif'],
+      datasets:[
+        {label:'租金下限（MAD）',data:[6000,7000,8000,10000],backgroundColor:'rgba(29,158,117,0.7)',borderRadius:4},
+        {label:'租金上限（MAD）',data:[9000,10000,12000,15000],backgroundColor:'rgba(29,158,117,0.3)',borderRadius:4},
+        {label:'建议月租预算上限',data:[8000,8000,8000,8000],type:'line',borderColor:'#D4537E',borderWidth:2,pointRadius:0,fill:false,borderDash:[6,3]}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{callback:v=>'MAD '+v.toLocaleString()}}},plugins:{legend:{labels:{font:{size:12}}}}}
+  });
+}
+
+function initGroupbuyChart(){
+  destroyChart('groupbuy');
+  const ctx=document.getElementById('groupbuyChart').getContext('2d');
+  chartInstances['groupbuy']=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['第1月','第2月','第3月','第4月','第5月','第6月','第7月','第8月','第9月','第10月','第11月','第12月'],
+      datasets:[
+        {label:'签约企业数（家）',data:[0,0,1,2,3,4,5,5,6,7,8,8],backgroundColor:'rgba(155,89,182,0.6)',borderRadius:4,type:'line',fill:false,borderColor:'#9B59B6',borderWidth:2,pointRadius:5,pointBackgroundColor:'#9B59B6',yAxisID:'y1'},
+        {label:'团购月收入（MAD）',data:[0,0,800,1800,3000,4200,5500,5800,7000,8000,9500,10000],backgroundColor:'rgba(155,89,182,0.3)',borderRadius:4,yAxisID:'y'}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,scales:{
+      y:{beginAtZero:true,ticks:{callback:v=>'MAD '+v.toLocaleString()},position:'left'},
+      y1:{beginAtZero:true,position:'right',grid:{drawOnChartArea:false},ticks:{callback:v=>v+'家'}}
+    },plugins:{legend:{labels:{font:{size:12}}}}}
+  });
+}
+
+function initTrendChart(){
+  destroyChart('trend');
+  const ctx=document.getElementById('trendChart').getContext('2d');
+  const months=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月','13月','14月','15月','16月','17月','18月'];
+  const nail=[8000,10000,12000,16000,20000,24000,30000,38000,42000,36000,38000,44000,46000,50000,52000,55000,58000,62000];
+  const drinks=[1000,1500,2500,4000,5500,7000,8000,9500,10500,9000,9500,11000,12000,13000,14000,15000,16000,18000];
+  const cost=Array(18).fill(28700);
+  chartInstances['trend']=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:months,
+      datasets:[
+        {label:'美甲营收（MAD）',data:nail,borderColor:'#D4537E',backgroundColor:'rgba(212,83,126,0.1)',fill:true,borderWidth:2,pointRadius:3,tension:0.3},
+        {label:'饮品+团购营收（MAD）',data:drinks,borderColor:'#9B59B6',backgroundColor:'rgba(155,89,182,0.1)',fill:true,borderWidth:2,pointRadius:3,tension:0.3},
+        {label:'月总成本（MAD）',data:cost,borderColor:'#EF9F27',borderWidth:2,borderDash:[6,3],pointRadius:0,fill:false}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{callback:v=>'MAD '+v.toLocaleString()}}},plugins:{legend:{labels:{font:{size:12}}}}}
+  });
+}
+
+function initRevStructChart(){
+  destroyChart('revstruct');
+  const ctx=document.getElementById('revStructChart').getContext('2d');
+  chartInstances['revstruct']=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['保守','基准','良好','理想'],
+      datasets:[
+        {label:'美甲（MAD）',data:[12000,22000,35000,52000],backgroundColor:'rgba(212,83,126,0.7)',borderRadius:4},
+        {label:'中式饮品零售（MAD）',data:[2000,4500,7500,11000],backgroundColor:'rgba(155,89,182,0.6)',borderRadius:4},
+        {label:'企业团购（MAD）',data:[1500,3500,6000,8000],backgroundColor:'rgba(29,158,117,0.6)',borderRadius:4},
+        {label:'精品咖啡（MAD）',data:[500,900,1300,2000],backgroundColor:'rgba(200,184,154,0.8)',borderRadius:4},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:v=>'MAD '+v.toLocaleString()}}},plugins:{legend:{labels:{font:{size:12}}}}}
+  });
+}
+
+function initRadarChart(){
+  destroyChart('radar');
+  const ctx=document.getElementById('radarChart').getContext('2d');
+  chartInstances['radar']=new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:['技术壁垒','私密体验','品牌视觉','双客群结构','团购先发优势','供应链成本'],
+      datasets:[
+        {label:'ATELIER VERT',data:[95,92,88,90,95,80],backgroundColor:'rgba(29,158,117,0.2)',borderColor:'#1D9E75',borderWidth:2,pointBackgroundColor:'#1D9E75'},
+        {label:'本地传统美甲店',data:[30,45,35,20,10,60],backgroundColor:'rgba(212,83,126,0.1)',borderColor:'#D4537E',borderWidth:1.5,pointBackgroundColor:'#D4537E'},
+        {label:'现有中国美甲店',data:[70,40,40,35,20,65],backgroundColor:'rgba(239,159,39,0.1)',borderColor:'#EF9F27',borderWidth:1.5,pointBackgroundColor:'#EF9F27'},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,scales:{r:{beginAtZero:true,max:100,ticks:{stepSize:20}}},plugins:{legend:{labels:{font:{size:12}}}}}
+  });
+}
+
+function initProfitChart(){
+  destroyChart('profit');
+  const ctx=document.getElementById('profitChart').getContext('2d');
+  chartInstances['profit']=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['保守','基准','良好','理想'],
+      datasets:[
+        {label:'月营收（MAD）',data:[16000,30900,49800,73000],backgroundColor:'rgba(29,158,117,0.6)',borderRadius:4},
+        {label:'月成本（MAD）',data:[28700,28700,28700,28700],backgroundColor:'rgba(212,83,126,0.5)',borderRadius:4},
+        {label:'月利润（MAD）',data:[-12700,2200,21100,44300],backgroundColor:(ctx2)=>{
+          return ctx2.raw>=0?'rgba(29,158,117,0.9)':'rgba(226,75,74,0.8)';
+        },borderRadius:4,type:'line',fill:false,borderColor:'#2C2C2A',borderWidth:2,pointRadius:5,pointBackgroundColor:'#2C2C2A'}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,scales:{y:{ticks:{callback:v=>'MAD '+v.toLocaleString()}}},plugins:{legend:{labels:{font:{size:12}}}}}
+  });
+}
+
+// init on load
+calc();
+</script>
+</body>
+</html>
